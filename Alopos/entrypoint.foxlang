@@ -1,54 +1,55 @@
 
 const STACK {
-	Byte4 BASE = 2M; // @TODO better address?
+	Address4 BASE = 2M; // @TODO better address? align 4k
 }
 
 const OS {
-	string NAME = "Alopos";
+	String NAME = "Alopos";
 	VERSION {
-		uint MAJOR = 0;
-		uint MINOR = 1;
+		Uint MAJOR = 0;
+		Uint MINOR = 1;
 	}
 }
 
 Multiboot {
 	Byte4 magic;
-	MultibootInfo info; // @TODO
+	//MultibootInfo info; // @TODO
 }
 
 
-function Entrypoint() {
+function EntryPoint() {
 	Cli();
 	%esp = STACK.BASE;
 	
 	Multiboot.magic = %eax; // %eax should contain the Multiboot bootloader magic number
-	Multiboot.info = (MultibootInfo)%ebx; // %ebx should contain a pointer to the Multiboot information
+	//Multiboot.info = (MultibootInfo)%ebx; // %ebx should contain a pointer to the Multiboot information // @TODO
 	
-	GDT.Init();
-	IDT.Init(); // interrupts, exceptions and IRQ
+	//GDT.Init(); // @TODO
+	//IDT.Init(); // interrupts, exceptions and IRQ // @TODO
 	CmdLine.Init();
 	
-	CmdLine.StartFromCursor();
+	//CmdLine.StartFromCursor(); // @TODO
 	CmdLine.colour.foreground = White;
-	CmdLine.Echo("\n% v%.%\n", OS.NAME, OS.VERSION.MAJOR, OS.VERSION.MINOR);
+	CmdLine.Echo(#Compose("\n% %.%\n", OS.NAME, OS.VERSION.MAJOR, OS.VERSION.MINOR));
 	
-	CmdLine.colour.SetDefault();
-	
-	// @section Tests:
+	//@section Tests:
 
 	if Multiboot.magic != MultibootInfo.BOOTLOADER_MAGIC {
 		EchoWarning("Warning: System not started correctly. System may not work. (Code: 0x%x)\n", Multiboot.magic);
 	}
 
 	// Bits 4 and 5 are mutually exclusive!
-	if MultibootInfo.FlagCheck(Multiboot.info.flags, 4) && MultibootInfo.FlagCheck(Multiboot.info.flags, 5) {
-		EchoWarning("Warning: Both Multiboot bits 4 and 5 are set.\n");
-		// @TODO error?
+	if MultibootInfo.FlagCheck(Multiboot.info.flags, 4)
+		&& MultibootInfo.FlagCheck(Multiboot.info.flags, 5) {
+			EchoWarning("Warning: Both Multiboot bits 4 and 5 are set.\n");
+			// @TODO error?
 	}
+	
+	CmdLine.colour.SetDefault();
 
 	CmdLine.Echo("Type 'help' for a list of commands.\n");
 
-	CommandInput();
+	/*CommandInput();
 
 	.InputLoop:
 		Hlt();
@@ -57,9 +58,9 @@ function Entrypoint() {
 			CommandTryAccept();
 		}
 
-		goto InputLoop;
+		goto .InputLoop;*/
 	
-	// @section kernel panic
+	//@section kernel panic
 	// @TODO kernel panic
 	.Hang:
 		Cli();
@@ -67,8 +68,7 @@ function Entrypoint() {
 		Jmp(.Hang);
 }
 
-function EchoWarning(string warning) {
-	CmdLine.colour = Red, Black;
+function EchoWarning(String warning) {
+	CmdLine.colour.foreground = Red;
 	CmdLine.Echo(warning);
-	CmdLine.colour.SetDefault();
 }

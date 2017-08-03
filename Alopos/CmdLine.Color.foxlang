@@ -1,0 +1,12 @@
+
+namespace CmdLine:
+
+struct Byte Color @packed {
+	Bit4 foreground;
+	Bit4 background;
+	
+	function SetDefault() {
+		foreground = LightGrey;
+		background = DarkGrey;
+	}
+}

@@ -1,4 +1,14 @@
 // Foxlang project
 
-#include('/Alopos/*')
-#entrypoint = Entrypoint
+#Compile #projectName {
+	entrypoint = EntryPoint;
+	output = '/bin/' . #projectName . '.bin';
+	format = Flat;
+	
+	Compile('/' . #projectName . '/*');
+	
+	run = {
+		Requires('QEMU');
+		Run('qemu-system-i386 -kernel ' . output);
+	}
+}
