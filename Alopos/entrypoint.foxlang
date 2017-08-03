@@ -1,0 +1,74 @@
+
+const STACK {
+	Byte4 BASE = 2M; // @TODO better address?
+}
+
+const OS {
+	string NAME = "Alopos";
+	VERSION {
+		uint MAJOR = 0;
+		uint MINOR = 1;
+	}
+}
+
+Multiboot {
+	Byte4 magic;
+	MultibootInfo info; // @TODO
+}
+
+
+function Entrypoint() {
+	Cli();
+	%esp = STACK.BASE;
+	
+	Multiboot.magic = %eax; // %eax should contain the Multiboot bootloader magic number
+	Multiboot.info = (MultibootInfo)%ebx; // %ebx should contain a pointer to the Multiboot information
+	
+	GDT.Init();
+	IDT.Init(); // interrupts, exceptions and IRQ
+	CmdLine.Init();
+	
+	CmdLine.StartFromCursor();
+	CmdLine.colour.foreground = White;
+	CmdLine.Echo("\n% v%.%\n", OS.NAME, OS.VERSION.MAJOR, OS.VERSION.MINOR);
+	
+	CmdLine.colour.SetDefault();
+	
+	// @section Tests:
+
+	if Multiboot.magic != MultibootInfo.BOOTLOADER_MAGIC {
+		EchoWarning("Warning: System not started correctly. System may not work. (Code: 0x%x)\n", Multiboot.magic);
+	}
+
+	// Bits 4 and 5 are mutually exclusive!
+	if MultibootInfo.FlagCheck(Multiboot.info.flags, 4) && MultibootInfo.FlagCheck(Multiboot.info.flags, 5) {
+		EchoWarning("Warning: Both Multiboot bits 4 and 5 are set.\n");
+		// @TODO error?
+	}
+
+	CmdLine.Echo("Type 'help' for a list of commands.\n");
+
+	CommandInput();
+
+	.InputLoop:
+		Hlt();
+
+		if (isAcceptCommand) {
+			CommandTryAccept();
+		}
+
+		goto InputLoop;
+	
+	// @section kernel panic
+	// @TODO kernel panic
+	.Hang:
+		Cli();
+		Hlt();
+		Jmp(.Hang);
+}
+
+function EchoWarning(string warning) {
+	CmdLine.colour = Red, Black;
+	CmdLine.Echo(warning);
+	CmdLine.colour.SetDefault();
+}

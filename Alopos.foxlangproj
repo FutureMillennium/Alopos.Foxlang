@@ -1,0 +1,4 @@
+// Foxlang project
+
+#include('/Alopos/*')
+#entrypoint = Entrypoint
