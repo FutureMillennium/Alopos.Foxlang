@@ -1,0 +1,43 @@
+
+/*namespace CmdLine:
+
+Cursor {
+
+	Byte startRegister {
+		@bits {
+			@5 cursorDisable;
+		}
+	}
+	
+	function SetPosition(Index row, Index col) {
+		unsigned short position = (row * 80) + col;
+
+		// cursor LOW port to vga INDEX register
+		OutB(ioPort, 0x0F);
+		OutB(ioPort + 1, (Byte)(position & 0xFF));
+		// cursor HIGH port to vga INDEX register
+		OutB(ioPort, 0x0E);
+		OutB(ioPort + 1, (Byte)((position >> 8) & 0xFF));
+	}
+
+	function SetToCurrentPosition() {
+		SetPosition(Current.row, Current.col);
+	}
+
+	function Enable() {
+
+		cursorStartRegister.bits.cursorDisable = 0;
+		
+		OutB(ioPort, 0x0A);
+		OutB(ioPort + 1, cursorStartRegister);
+	}
+
+	function Disable() {
+
+		cursorStartRegister.bits.cursorDisable = 1;
+
+		OutB(ioPort, 0x0A);
+		OutB(ioPort + 1, cursorStartRegister);
+	}
+	
+}*/

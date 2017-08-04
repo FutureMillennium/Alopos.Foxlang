@@ -31,7 +31,7 @@ enum Bit4 Colors {
 	White = 15,
 };
 
-struct Byte2 ScreenChar @packed {
+struct Byte2 Entry @packed {
 	Color color;
 	Char char;
 }
@@ -40,82 +40,111 @@ struct Byte2 ScreenChar @packed {
 //@section vars
 
 Current {
-	Index row;
-	Index col;
+	Index{0 .. < MAX.COL * MAX.ROW} position;
 	Color color;
 }
 
-volatile Byte2 Pointer buffer;
+volatile Byte2 Pointer screenBuffer;
 
 Byte2 ioPort; // base IO port for video (VGA), usually 0x3D4
-Cursor {
-	Byte startRegister {
-		@bits {
-			@5 cursorDisable;
-		}
-	}
-}
+
 
 //@section
 
 function Init() { //@entry
 
-	Current.color = LightGrey, DarkGrey;
-	ioPort = valueof 0x0463; // @TODO always at 0x0463?
+	Current.position = 0;
+	Current.color.SetDefault();
+	/*ioPort = valueof 0x0463; // @TODO always at 0x0463?
 
 	OutB(ioPort, 0x0A); // Cursor Start Register
-	Cursor.startRegister = InB(ioPort + 1);
-
-	Current.row = 0;
-	Current.col = 0;
+	Cursor.startRegister = InB(ioPort + 1);*/
 
 	// @TODO monochrome monitors at 0xB0000?
 	// @TODO video address const
 	// @TODO is it always 0xB8000?
-	buffer = 0xB8000; // VGA text mode 3 video buffer address
+	screenBuffer = 0xB8000; // VGA text mode 3 video buffer address
 }
 
-// @TODO:
-function EntryPut_Terminal_VGA(char character, Byte color, Index x, Index y) {
-	const Index index = y * COLS_MAX_VGA + x;
-	buffer[index] = EntryMake_VGA(character, color);
-}
+/*function PutEntry(Char character, Color color, Index x, Index y) {
+	const Index index = y * MAX.COLS + x;
+	screenBuffer[index] = Entry(character, color);
+}*/
 
-function NewLine_Terminal_VGA() {
-	colCurrentTerminal_VGA = 0;
-	if (++rowCurrentTerminal_VGA == ROWS_MAX_VGA) {
-		rowCurrentTerminal_VGA = 0;
-		// TODO scroll screen
+/*function NewLine() {
+	Current.col = 0;
+	Current.row++;
+	if (Current.row == MAX.ROWS) {
+		Current.row = 0;
+		// @TODO scroll screen
 	}
 
 	// clear line
-	for (Index i = 0; i < COLS_MAX_VGA; i++) {
-		EntryPut_Terminal_VGA(0, colorCurrentTerminal_VGA, i, rowCurrentTerminal_VGA);
+	for Index i = 0 .. < MAX.COLS {
+		PutEntry(0, Current.color, i, Current.row);
 	}
-}
+}*/
 
-function Backspace_Terminal_VGA() {
-	colCurrentTerminal_VGA--;
-	EntryPut_Terminal_VGA(0, colorCurrentTerminal_VGA, colCurrentTerminal_VGA, rowCurrentTerminal_VGA);
-}
+/*function Backspace() {
+	Current.col--;
+	PutEntry(0, Current.color, Current.col, Current.row);
+}*/
 
-function PutChar_Terminal_VGA(char character) {
-	if (character == '\n') {
-		NewLine_Terminal_VGA();
-	} else {
-		EntryPut_Terminal_VGA(character, colorCurrentTerminal_VGA, colCurrentTerminal_VGA, rowCurrentTerminal_VGA);
-		colCurrentTerminal_VGA++;
-		if (colCurrentTerminal_VGA == COLS_MAX_VGA) {
-			NewLine_Terminal_VGA();
+function PutChar(char character) {
+	/*if (character == '\n') {
+		NewLine();
+	} else {*/
+		screenBuffer[Current.position] = Entry(character, Current.color);
+		Current.position++;
+		if Current.position >= MAX.COLS * MAX.ROWS {
+			Current.position = 0;
 		}
-	}
+	/*}*/
 }
 
-
-// Echo("Foo");
+// @TODO rewrite for String
+// Echo("Foo"); // "Foo"
+// Echo("Foo", "bar"); // "Foobar"
 // Echo("String: %s", "foo");
-// Echo("String: %s%", "foo", "\nAnd another: %s", "bar");
-function Echo(const char* text, ...) {
+// Echo("String: %s", "foo", "\nAnd another: %s", "bar");
+function Echo(String text) {
+	Char Pointer c = text;
+	
+	while (valueof c != 0) {
+		PutChar(valueof c);
+		c++;
+	}
+}
+/*function Echo(String text, ...) {
+	Char c = text[0];
+	
+	if c == '%' {
+		c++;
+		
+		switch c {
+			case _'%' { //%% = %
+				PutChar(c);
+			}
+			case _'i' //%i
+			case _'u' //%u
+			case _'x' //%x
+			case _'b' //%b
+			{
+				Char[17] buffer;
+			}
+			case _'s' {
+				
+			}
+			else {
+				
+			}
+		}
+	} else {
+		PutChar(c);
+	}
+}*/
+
+/*function Echo(const char* text, ...) {
 
 	char** args = (char **)&text;
 	char* arg = *args;
@@ -129,7 +158,7 @@ function Echo(const char* text, ...) {
 
 			switch (c) {
 				case '%':
-					PutChar_Terminal_VGA(c);
+					PutChar(c);
 					break;
 
 				case 'i': // signed int
@@ -139,7 +168,7 @@ function Echo(const char* text, ...) {
 				{
 					char buffer[17];
 					args++;
-					Number2String(*(int*)args, buffer, c);
+					NumberToString(*(int*)args, buffer, c);
 					tmp = buffer;
 					goto echoString;
 				}
@@ -151,7 +180,7 @@ function Echo(const char* text, ...) {
 
 				echoString:
 					while (*tmp)
-						PutChar_Terminal_VGA(*tmp++);
+						PutChar(*tmp++);
 					break;
 			}
 			tmp = arg;
@@ -161,12 +190,12 @@ function Echo(const char* text, ...) {
 			}
 
 		} else {
-			PutChar_Terminal_VGA(c);
+			PutChar(c);
 		}
 	}
-}
+}*/
 
-function SetPositionToCursor() {
+/*function SetPositionToCursor() {
 	Byte2 pos;
 
 	OutB(ioPort, 0x0e);
@@ -176,37 +205,4 @@ function SetPositionToCursor() {
 	
 	Current.row = pos % MAX.COLS;
 	Current.col = pos / MAX.COLS;
-}
-
-Cursor {
-	function SetPosition(Index row, Index col) {
-		unsigned short position = (row * 80) + col;
-
-		// cursor LOW port to vga INDEX register
-		OutB(ioPort, 0x0F);
-		OutB(ioPort + 1, (Byte)(position & 0xFF));
-		// cursor HIGH port to vga INDEX register
-		OutB(ioPort, 0x0E);
-		OutB(ioPort + 1, (Byte)((position >> 8) & 0xFF));
-	}
-
-	function SetToCurrentPosition() {
-		SetPosition(Current.row, Current.col);
-	}
-
-	function Enable() {
-
-		cursorStartRegister.bits.cursorDisable = 0;
-		
-		OutB(ioPort, 0x0A);
-		OutB(ioPort + 1, cursorStartRegister);
-	}
-
-	function Disable() {
-
-		cursorStartRegister.bits.cursorDisable = 1;
-
-		OutB(ioPort, 0x0A);
-		OutB(ioPort + 1, cursorStartRegister);
-	}
-}
+}*/
