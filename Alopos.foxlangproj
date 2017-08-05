@@ -1,11 +1,11 @@
 // Foxlang project
 
 #Compile #projectName {
-	entrypoint = EntryPoint;
+	entryPoint = EntryPoint;
 	output = '/bin/' . #projectName . '.bin';
 	format = Flat;
 	
-	Compile('/' . #projectName . '/*');
+	Add('/' . #projectName . '/*');
 	
 	run = {
 		Requires('QEMU');
