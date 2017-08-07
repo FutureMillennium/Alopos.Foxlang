@@ -1,5 +1,5 @@
 
-namespace CmdLine:
+/*namespace CmdLine:
 
 
 //@section consts
@@ -9,10 +9,14 @@ const MAX {
 	Index ROWS = 25;
 }
 
+// @TODO monochrome monitors at 0xB0000?
+// @TODO is it always 0xB8000?
+const Byte Pointer screenBuffer = 0xB8000; // VGA text mode 3 video buffer address
+
 
 //@section defs
 
-enum Bit4 Colors {
+enum Bit4 Color4b {
 	Black = 0,
 	Blue = 1,
 	Green = 2,
@@ -29,48 +33,43 @@ enum Bit4 Colors {
 	LightMagenta = 13,
 	LightBrown = 14,
 	White = 15,
-};
+}
 
-struct Byte2 Entry @packed {
+// @TODO
+/*struct Byte2 Entry @packed {
 	Color color;
 	Char char;
-}
+}*/
 
 
 //@section vars
 
 Current {
-	Index{0 .. < MAX.COL * MAX.ROW} position;
-	Color color;
+	Index/*{0 .. < MAX.COL * MAX.ROW}*/ position = 0; // @TODO range
+	const Color color = @; // @TODO
 }
 
-volatile Byte2 Pointer screenBuffer;
-
-Byte2 ioPort; // base IO port for video (VGA), usually 0x3D4
+//Byte2 ioPort; // base IO port for video (VGA), usually 0x3D4 // @TODO
 
 
 //@section
 
-function Init() { //@entry
+// @TODO
+/*function Init() { //@entry
 
-	Current.position = 0;
-	Current.color.SetDefault();
-	/*ioPort = valueof 0x0463; // @TODO always at 0x0463?
+	ioPort = valueof 0x0463; // @TODO always at 0x0463?
 
 	OutB(ioPort, 0x0A); // Cursor Start Register
-	Cursor.startRegister = InB(ioPort + 1);*/
+	Cursor.startRegister = InB(ioPort + 1);
+}*/
 
-	// @TODO monochrome monitors at 0xB0000?
-	// @TODO video address const
-	// @TODO is it always 0xB8000?
-	screenBuffer = 0xB8000; // VGA text mode 3 video buffer address
-}
-
+// @TODO
 /*function PutEntry(Char character, Color color, Index x, Index y) {
 	const Index index = y * MAX.COLS + x;
 	screenBuffer[index] = Entry(character, color);
 }*/
 
+// @TODO
 /*function NewLine() {
 	Current.col = 0;
 	Current.row++;
@@ -85,20 +84,24 @@ function Init() { //@entry
 	}
 }*/
 
+// @TODO
 /*function Backspace() {
 	Current.col--;
 	PutEntry(0, Current.color, Current.col, Current.row);
 }*/
 
-function PutChar(char character) {
+function PutChar(Char character) {
+	// @TODO
 	/*if (character == '\n') {
 		NewLine();
 	} else {*/
-		screenBuffer[Current.position] = Entry(character, Current.color);
-		Current.position++;
-		if Current.position >= MAX.COLS * MAX.ROWS {
+		//screenBuffer[Current.position] = Entry(Current.color, character);
+		screenBuffer[Current.position] = Current.color;
+		screenBuffer[Current.position + 1] = character;
+		Current.position += 2;
+		/*if Current.position >= MAX.COLS * MAX.ROWS { // @TODO
 			Current.position = 0;
-		}
+		}*/
 	/*}*/
 }
 
@@ -143,7 +146,6 @@ function Echo(String text) {
 		PutChar(c);
 	}
 }*/
-
 /*function Echo(const char* text, ...) {
 
 	char** args = (char **)&text;
@@ -195,6 +197,7 @@ function Echo(String text) {
 	}
 }*/
 
+// @TODO
 /*function SetPositionToCursor() {
 	Byte2 pos;
 
@@ -205,4 +208,4 @@ function Echo(String text) {
 	
 	Current.row = pos % MAX.COLS;
 	Current.col = pos / MAX.COLS;
-}*/
+}*/*/

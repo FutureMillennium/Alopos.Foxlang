@@ -1,12 +1,13 @@
 
-namespace CmdLine:
+/*namespace CmdLine:
 
 struct Byte Color @packed {
-	Bit4 foreground;
-	Bit4 background;
+	Color4b foreground = LightGrey;
+	Color4b background = DarkGrey;
 	
-	function SetDefault() {
-		foreground = LightGrey;
-		background = DarkGrey;
-	}
-}
+	// @TODO
+	/*function SetDefault() { // @TODO make this a language feature?
+		foreground = LightGrey; // @TODO @default
+		background = DarkGrey; // @TODO @default
+	}*/
+}*/
