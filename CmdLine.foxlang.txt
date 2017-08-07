@@ -1,0 +1,95 @@
+namespace CmdLine:
+		!Namespace:
+const
+		+Const
+MAX {
+		+Namespace
+Index
+		+Type
+COLS =
+		!Symbol=
+		+ComposeValue
+80
+;
+		-ComposeValue
+		!Value=
+		-Type
+Index
+		+Type
+ROWS =
+		!Symbol=
+		+ComposeValue
+25
+;
+		-ComposeValue
+		!Value=
+		-Type
+}
+		-Namespace
+		-Const
+		
+const
+Byte
+Pointer
+screenBuffer =
+0xB8000
+;
+
+Current {
+Index
+position =
+0
+;
+const
+Byte
+color =
+0x87
+;
+}
+
+function PutChar(
+Char
+character
+)
+{
+screenBuffer[
+Current.position
+]
+=
+Current.color
+;
+screenBuffer[
+Current.position
++
+1
+]
+=
+character
+;
+Current.position +=
+2
+;
+}
+
+function Echo(
+String 
+text
+) 
+{
+Char 
+Pointer 
+c = 
+text
+;
+while 
+valueof c !=
+0
+{
+PutChar(
+valueof c
+)
+;
+c ++
+;
+}
+}

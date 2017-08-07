@@ -1,6 +1,5 @@
 
-/*namespace CmdLine:
-
+namespace CmdLine:
 
 //@section consts
 
@@ -16,7 +15,7 @@ const Byte Pointer screenBuffer = 0xB8000; // VGA text mode 3 video buffer addre
 
 //@section defs
 
-enum Bit4 Color4b {
+/*enum Bit4 Color4b {
 	Black = 0,
 	Blue = 1,
 	Green = 2,
@@ -33,7 +32,7 @@ enum Bit4 Color4b {
 	LightMagenta = 13,
 	LightBrown = 14,
 	White = 15,
-}
+}*/
 
 // @TODO
 /*struct Byte2 Entry @packed {
@@ -46,7 +45,8 @@ enum Bit4 Color4b {
 
 Current {
 	Index/*{0 .. < MAX.COL * MAX.ROW}*/ position = 0; // @TODO range
-	const Color color = @; // @TODO
+	//const Color color = @; // @TODO
+	const Byte color = 0x87;
 }
 
 //Byte2 ioPort; // base IO port for video (VGA), usually 0x3D4 // @TODO
@@ -208,4 +208,4 @@ function Echo(String text) {
 	
 	Current.row = pos % MAX.COLS;
 	Current.col = pos / MAX.COLS;
-}*/*/
+}*/

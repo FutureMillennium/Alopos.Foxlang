@@ -1,0 +1,61 @@
+#Compile
+		+ HashCompileBlock
+		+ PreCompose
+#projectName
+{
+		- PreCompose
+		!ProjectName
+entryPoint =
+		+ Assigning
+		+ PreCompose
+EntryPoint
+;
+		- PreCompose
+		!Assign
+		- Assigning
+output =
+		+ Assigning
+		+ PreCompose
+'/bin/' . #projectName . '.bin'
+;
+		- PreCompose
+		!Assign
+		- Assigning
+format =
+		+ Assigning
+		+ PreCompose
+Flat
+;
+		- PreCompose
+		!Assign
+		- Assigning
+Add(
+		+ Assigning
+		+ PreCompose
+'/' . #projectName . '/*'
+);
+		- PreCompose
+		!Assign
+		- Assigning
+run = {
+		+ RunCompileBlock
+Requires(
+		+ Assigning
+		+ PreCompose
+'QEMU'
+);
+		- PreCompose
+		!Assign
+		- Assigning
+Run(
+		+ Assigning
+		+ PreCompose
+'qemu-system-i386 -kernel ' . output
+);
+		- PreCompose
+		!Assign
+		- Assigning
+}
+		- RunCompileBlock
+}
+		- HashCompileBlock

@@ -1,0 +1,110 @@
+const
+		+Const
+STACK {
+		+Namespace
+Address4 
+		+Type
+BASE = 
+		!Symbol=
+2M
+;
+		!Assign
+		-Type
+}
+		-Namespace
+		-Const
+
+const
+		+Const
+OS {
+		+Namespace
+String
+		+Type
+NAME =
+		!Symbol=
+"Alopos"
+;
+		!Value=
+		-Type
+VERSION {
+		+Namespace
+Uint
+		+Type
+MAJOR =
+		!Symbol=
+0
+;
+		!Value=
+		-Type
+Uint
+		+Type
+MINOR =
+		!Symbol=
+1
+;
+		!Value=
+		-Type
+}
+		-Namespace
+}
+		-Namespace
+		-Const
+		
+Multiboot {
+		+Namespace
+	Byte4 magic
+		+Type
+;
+		-Type
+}
+		-Namespace
+		
+function EntryPoint (
+		+Function
+		+Arguments
+)
+		-Arguments
+{
+		+FunctionBlock
+Cli(
+);
+				Cli
+%esp =
+		+Assiging
+STACK.BASE
+;
+		!Assign
+		-Assiging
+				mov %esp = STACK.BASE
+CmdLine.Echo(
+		+Calling
+		+Assigning
+"Hello from Alopos!"
+);
+		!Assign
+		-Assiging
+				push #^^^
+		!Call
+		-Calling
+				call CmdLine.Echo(…)
+.Hang:
+		!Label
+Cli(
+);
+				Cli
+Hlt(
+);
+				Hlt
+Jmp(
+		+Calling
+		+Assigning
+.Hang
+);
+		!Assign
+		-Assigning
+		!Call
+		-Calling
+				Jmp .Hang
+}
+		-FunctionBlock
+		-Function
