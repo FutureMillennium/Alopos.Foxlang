@@ -26,13 +26,14 @@ function EntryPoint() { //@entry
 	
 	//GDT.Init(); // @TODO
 	//IDT.Init(); // interrupts, exceptions and IRQ // @TODO
-	CmdLine.Init();
+	//CmdLine.Init(); // @TODO
 	
 	//CmdLine.SetPositionToCursor(); // @TODO
 	
 	//CmdLine.colour.foreground = White;
 	//CmdLine.NewLine();
-	CmdLine.Echo(#Compose("% %.%", OS.NAME, OS.VERSION.MAJOR, OS.VERSION.MINOR));
+	//CmdLine.Echo(#Compose("% %.%", OS.NAME, OS.VERSION.MAJOR, OS.VERSION.MINOR)); // @TODO
+	CmdLine.Echo("Hello from Alopos!");
 	//CmdLine.NewLine();
 	
 	//@section Tests:

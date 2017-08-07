@@ -1,0 +1,58 @@
+	// function EntryPoint()
+Cli
+mov %esp = STACK.BASE //@symbol 4
+
+	//#Compose("% %.%", OS.NAME, OS.VERSION.MAJOR, OS.VERSION.MINOR)
+	#declare "Alopos 0.1"
+push #^^^ //@literal
+call CmdLine.Echo(…) //@symbol 4
+
+	.Hang:
+Cli
+Hlt
+Jmp .Hang
+
+	// function CmdLine.Echo(String text)
+pop %eax // Char Pointer c = text;
+
+	.Loop: // while (valueof c != 0) {
+if [%eax]b == 0
+	Jmp .End
+
+push %eax
+push [%eax] // PutChar(valueof c);
+call CmdLine.Putchar(…) //@symbol 4
+pop %eax
+
+inc %eax // c++;
+
+Jmp .Loop // }
+	.End:
+ret
+
+	// function PutChar(char character) {
+mov %eax = 0xB8000
+mov %ebx = [Current.position] //@symbol 4
+add %eax = %eax + %ebx
+mov [%eax] = Current.color //@symbol 4
+
+inc %eax
+pop %cl
+mov [%eax] = %cl
+
+add %ebx += 2
+mov [Current.position] = %ebx //@symbol 4
+
+ret
+
+/*popb %cx
+mov %dx = [Current.color]
+shl %dx = %dx << 16
+or %cx = %cx | %dx
+
+movw [%eax] = %cx
+
+inc %ebx
+mov [Current.position] = %ebx
+
+ret*/
