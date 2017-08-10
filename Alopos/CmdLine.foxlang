@@ -44,7 +44,7 @@ const Byte Pointer screenBuffer = 0xB8000; // VGA text mode 3 video buffer addre
 //@section vars
 
 Current {
-	Index/*{0 .. < MAX.COL * MAX.ROW}*/ position = 0; // @TODO range
+	Index /*{0 .. < MAX.COL * MAX.ROW}*/ position = 0; // @TODO range
 	//const Color color = @; // @TODO
 	const Byte color = 0x87;
 }
@@ -113,7 +113,7 @@ function PutChar(Char character) {
 function Echo(String text) {
 	Char Pointer c = text;
 	
-	while (valueof c != 0) {
+	while valueof c != 0 {
 		PutChar(valueof c);
 		c++;
 	}

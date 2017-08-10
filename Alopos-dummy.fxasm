@@ -13,18 +13,18 @@ Hlt
 Jmp .Hang
 
 	// function CmdLine.Echo(String text)
-pop %eax // Char Pointer c = text;
+pop %ecx // Char Pointer c = text;
 
 	.Loop: // while (valueof c != 0) {
-if [%eax]b == 0
+if [%ecx]b == 0
 	Jmp .End
 
-push %eax
-push [%eax] // PutChar(valueof c);
+push %ecx
+push [%ecx] // PutChar(valueof c);
 call CmdLine.Putchar(…) //@symbol 4
-pop %eax
+pop %ecx
 
-inc %eax // c++;
+inc %ecx // c++;
 
 Jmp .Loop // }
 	.End:
@@ -37,7 +37,7 @@ add %eax = %eax + %ebx
 mov [%eax] = Current.color //@symbol 4
 
 inc %eax
-pop %cl
+pop %cx
 mov [%eax] = %cl
 
 add %ebx += 2

@@ -53,11 +53,20 @@ character
 )
 {
 screenBuffer[
+		!Move address into %eax
+		+ArrayAccess
+		+ValueParsing
 Current.position
 ]
+		-ValueParsing
+		!Add value to %eax
 =
+		+ValueParsing
 Current.color
 ;
+		-ValueParsing
+		!Write value to [%eax]
+		-ArrayAccess
 screenBuffer[
 Current.position
 +
@@ -77,19 +86,39 @@ text
 ) 
 {
 Char 
+		+Type
 Pointer 
 c = 
+		!Symbol=
+		+ValueParsing
 text
 ;
+		-ValueParsing
+		-Type
 while 
-valueof c !=
+		+While
+		+Condition
+		+ValueParsing
+valueof
+c
+!=
+		-ValueParsing
+		+ValueParsing
 0
 {
+		-ValueParsing
+		-Condition
 PutChar(
+		+Call
+		+ValueParsing
 valueof c
-)
-;
-c ++
-;
+) ;
+		-ValueParsing
+		!Call
+		-Call
+c ++ ;
+		!Assignment
 }
+		!While
+		-While
 }
