@@ -1,0 +1,35 @@
+// function EntryPoint()
+	Cli
+	Mov %esp = 2M
+
+	Push "Alopos says hello!"
+	Call CmdLine.Echo
+
+.Hang:
+	Cli
+	Hlt
+	Jmp .Hang
+
+.CmdLine.Echo:
+	Pop %ecx
+	Mov %eax = SCREEN_BUFFER
+	
+		.Loop:
+	CmpB [%ecx], 0
+	Je .End
+
+	MovB [%eax] = 0x87
+	Inc %eax
+	
+	MovB [%eax] = %ch
+	Inc %eax
+
+	Inc %ecx
+
+	CmpB [%ecx], 0
+	Jne .Loop
+		.End:
+	Ret
+	
+.data:
+	SCREEN_BUFFER = 0xB8000
