@@ -3,7 +3,7 @@
 	Mov %esp = 2M
 
 	Push "Alopos says hello!"
-	Call CmdLine.Echo
+	Call .CmdLine.Echo
 
 .Hang:
 	Cli
