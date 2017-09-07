@@ -2,10 +2,10 @@
 
 #Compile #projectName {
 	entryPoint = EntryPoint;
-	output = '/bin/' . #projectName . '.bin';
+	output = 'bin/' . #projectName . '.bin';
 	format = Flat;
 	
-	Add('/' . #projectName . '/*');
+	Add(#projectName . '/*');
 	
 	run = {
 		Requires('QEMU');

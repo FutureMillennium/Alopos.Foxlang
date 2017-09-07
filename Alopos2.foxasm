@@ -1,9 +1,13 @@
+#format Flat
+#extension '.bin'
+#address 1M
+
 // function EntryPoint()
 	Cli
 	Mov %esp = 2M
 
-	Push "Alopos says hello!"
-	Call CmdLine.Echo
+	PushL "Alopos says hello!"
+	Call .CmdLine.Echo
 
 .Hang:
 	Cli
@@ -11,24 +15,30 @@
 	Jmp .Hang
 
 .CmdLine.Echo:
-	Pop %ecx
+	Push %ebp
+	Mov %ebp = %esp
+	
+	Mov %ecx = [%ebp + 8]
 	Mov %eax = SCREEN_BUFFER
 	
-		.Loop:
-	CmpB [%ecx], 0
+	MovB %bl = [%ecx]
+	CmpB %bl, 0
 	Je .End
-
+	
+		.Loop:
 	MovB [%eax] = 0x87
 	Inc %eax
 	
-	MovB [%eax] = %ch
+	MovB [%eax] = %bl
 	Inc %eax
 
 	Inc %ecx
 
-	CmpB [%ecx], 0
+	MovB %bl = [%ecx]
+	CmpB %bl, 0
 	Jne .Loop
 		.End:
+	Pop %ebp
 	Ret
 	
 .data:

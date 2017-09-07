@@ -1,0 +1,32 @@
+#format Flat
+#extension '.bin'
+#address 1M
+
+	Cli
+	Mov %esp = 2M
+
+	Mov %ecx = "Alopos says hello!"
+	Mov %eax = SCREEN_BUFFER
+	
+	MovB %bl = [%ecx]
+		.Loop:
+	MovB [%eax] = 0x87
+	Inc %eax
+	
+	MovB [%eax] = %bl
+	Inc %eax
+
+	Inc %ecx
+
+	MovB %bl = [%ecx]
+	CmpB %bl, 0
+	Jne .Loop
+
+.Hang:
+	Cli
+	Hlt
+	Jmp .Hang
+
+
+.data:
+	SCREEN_BUFFER = 0xB8000
