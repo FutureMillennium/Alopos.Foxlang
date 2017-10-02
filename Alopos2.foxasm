@@ -2,7 +2,20 @@
 #extension '.bin'
 #address 1M
 
-// function EntryPoint()
+	Jmp .EntryPoint
+	#Align 4
+
+.MultibootHeader:
+	#Put4 MULTIBOOT_MAGIC		// 0	u32	magic	required 
+	#Put4 MULTIBOOT_FLAGS		// 4	u32	flags	required 
+	#Put4 MULTIBOOT_CHECKSUM		// 8	u32	checksum	required 
+	#Put4 .MultibootHeader		// 12	u32	header_addr	if flags[16] is set 
+	#Put4 #address 		// 16	u32	load_addr	if flags[16] is set 
+	#Put4 0		// 20	u32	load_end_addr	if flags[16] is set 
+	#Put4 0		// 24	u32	bss_end_addr	if flags[16] is set 
+	#Put4 .EntryPoint		// 28	u32	entry_addr	if flags[16] is set 
+
+.EntryPoint:
 	Cli
 	Mov %esp = 2M
 
@@ -26,10 +39,10 @@
 	Je .End
 	
 		.Loop:
-	MovB [%eax] = 0x87
+	MovB [%eax] = %bl
 	Inc %eax
 	
-	MovB [%eax] = %bl
+	MovB [%eax] = 0x87
 	Inc %eax
 
 	Inc %ecx
@@ -42,4 +55,8 @@
 	Ret
 	
 .data:
+	MULTIBOOT_MAGIC = 0x1BADB002
+	MULTIBOOT_FLAGS = 0x10002
+	MULTIBOOT_CHECKSUM = 0 - (MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
+
 	SCREEN_BUFFER = 0xB8000
