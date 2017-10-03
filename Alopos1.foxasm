@@ -20,7 +20,7 @@
 	Cli
 	Mov %esp = 2M
 
-	Mov %ecx = "Alopos says hello!"
+	Mov %ecx = "Alopos1 says hello!"
 	Mov %eax = SCREEN_BUFFER
 	
 	MovB %bl = [%ecx]

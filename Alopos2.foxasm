@@ -19,7 +19,7 @@
 	Cli
 	Mov %esp = 2M
 
-	PushL "Alopos says hello!"
+	PushL "Alopos2 says hello!"
 	Call .CmdLine.Echo
 
 .Hang:
