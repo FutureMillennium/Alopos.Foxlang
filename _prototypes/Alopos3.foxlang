@@ -1,0 +1,59 @@
+#format = Flat;
+#extension = '.bin';
+#address = 1M;
+
+const MULTIBOOT {
+	Byte4 MAGIC = 0x1BADB002;
+	Byte4 FLAGS = 0x10002; // @TODO better bit field?
+	Byte4 CHECKSUM = 0 - (MAGIC + FLAGS);
+}
+
+const STACK {
+	Address4 BASE = 2M; // @TODO better address? align 4k
+}
+
+
+const Byte Pointer SCREEN_BUFFER = 0xB8000; // VGA text mode 3 video buffer address
+// @TODO monochrome monitors at 0xB0000?
+// @TODO is it always 0xB8000?
+
+
+function EntryPoint() { // @TODO @noStack
+	
+		Jmp(.Start); // @TODO non-Multiboot boot handling
+		
+		#Align(4);
+		
+	.MultibootHeader:
+		#Put4(MULTIBOOT.MAGIC);		// 0	u32	magic	required 
+		#Put4(MULTIBOOT.FLAGS);		// 4	u32	flags	required 
+		#Put4(MULTIBOOT.CHECKSUM);		// 8	u32	checksum	required 
+		#Put4(addressOf .MultibootHeader);		// 12	u32	header_addr	if flags[16] is set 
+		#Put4(#address); 		// 16	u32	load_addr	if flags[16] is set 
+		#Put4(0);		// 20	u32	load_end_addr	if flags[16] is set 
+		#Put4(0);		// 24	u32	bss_end_addr	if flags[16] is set 
+		#Put4(addressOf .Start);	// 28	u32	entry_addr	if flags[16] is set 
+		
+	.Start:
+		Cli();
+		%esp = STACK.BASE;
+		
+		Byte Pointer curPos = SCREEN_BUFFER;
+		Char Pointer message = "Alopos3 says hello!"; // @TODO casting? // @TODO CString
+		
+		while ([message] != 0) {
+			[curPos] = [message];
+			curPos++;
+			[curPos] = 0x87; // @TODO casting? //(Char 0x87)
+			curPos++;
+			message++;
+		}
+		
+	//@section kernel panic
+	// @TODO kernel panic
+	.Hang:
+		Cli();
+		Hlt();
+		Jmp(.Hang);
+	
+}
