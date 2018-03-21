@@ -37,6 +37,7 @@ function EntryPoint() { // @TODO @noStack
 	.Start:
 		Cli();
 		%esp = STACK.BASE;
+		%ebp = %esp;
 		
 		Byte Pointer curPos = SCREEN_BUFFER;
 		Char Pointer message = "Alopos3 says hello!"; // @TODO casting? // @TODO CString
