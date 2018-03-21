@@ -1,0 +1,51 @@
+#format = Flat;
+//#bits = 16;
+#address = 0x7c00;
+
+struct { // 6 bytes, goes in GDTR (GDT register)
+	Byte2 size; // size is actual size - 1
+	GDTSegmentDescriptor[] address; // @TODO
+} gdtDescriptor;
+
+struct GDTSegmentDescriptor { // 8 bytes, GDT entry
+	Byte2 limit_low;
+	Byte2 base_low;
+	Byte base_middle;
+	
+	Bit present;
+	Bit2 ringLevel;
+	bitfield[5] access {
+		1;
+		executable;
+		direction;
+		readWrite;
+		accessed;
+	};
+	
+	bitfield[4] flags {
+		granularity;
+		size;
+		0;
+		0;
+	};
+	Bit4 limit_high;
+	Byte base_high;
+}
+
+
+
+
+function EntryPoint() #noRet #noStack {
+	Cli();
+	Lgdt(gdtDescriptor);
+	%eax = %cr0;
+	%al |= 1; // set PE (Protection Enable) bit in CR0 (Control Register 0)
+	%cr0 = %eax;
+	
+	Jmp(08h:.PModeMain); // @TODO check Alopos.C
+.PModeMain:
+	
+}
+
+#Align(512 - 2; padWith = 0x00);
+#Put2(0xaa55); // boot sector magic number

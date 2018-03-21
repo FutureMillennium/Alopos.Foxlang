@@ -1,14 +1,13 @@
 // Foxlang project
 
-#Compile #projectName {
+#Compile('bootloader.foxlang';
+	output = 'bin/boot.bin';
+);
+
+#Compile(#projectName . '/*';
 	entryPoint = EntryPoint;
-	output = 'bin/' . #projectName . '.bin';
+	output = 'vvfat/' . #projectName . '.bin';
 	format = Flat;
-	
-	Add(#projectName . '/*');
-	
-	run = {
-		Requires('QEMU');
-		Run('qemu-system-i386 -kernel ' . output);
-	}
-}
+);
+
+#runAction = 'bochs.bxrc';
