@@ -3,14 +3,13 @@
 #address = 0x7c00;
 
 struct { // 6 bytes, goes in GDTR (GDT register)
-	Byte2 size; // size is actual size - 1
-	GDTSegmentDescriptor[] address; // @TODO
+	Byte2 size = sizeof(gdtSegments) - 1; // size is actual size - 1
+	GDTSegmentDescriptor[] Pointer address = &gdtSegments;
 } gdtDescriptor;
 
-struct GDTSegmentDescriptor { // 8 bytes, GDT entry
-	Byte2 limit_low;
-	Byte2 base_low;
-	Byte base_middle;
+struct GDTSegmentDescriptor #packed { // 8 bytes, GDT entry
+	Bit[20] limit[0 .. 15];
+	Byte4 base[0 .. 2];
 	
 	Bit present;
 	Bit2 ringLevel;
@@ -28,11 +27,75 @@ struct GDTSegmentDescriptor { // 8 bytes, GDT entry
 		0;
 		0;
 	};
-	Bit4 limit_high;
-	Byte base_high;
+	Bit[20] limit[16 .. 19];
+	Byte4 base[3];
 }
 
-
+GDTSegmentDescriptor[] gdtSegments = [
+	{ // NULL segment
+		Bit[20] limit = 0;
+		Byte4 base = 0;
+		
+		Bit present = 0;
+		Bit2 ringLevel = 0;
+		bitfield[5] access {
+			1;
+			executable = 0;
+			direction = 0;
+			readWrite = 0;
+			accessed = 0;
+		};
+		
+		bitfield[4] flags {
+			granularity = 0;
+			size = 0;
+			0;
+			0;
+		};
+	},
+	{ // kernel code segment
+		Bit[20] limit = 0xFFFFF;
+		Byte4 base = 0;
+		
+		Bit present = 1;
+		Bit2 ringLevel = 0;
+		bitfield[5] access {
+			1;
+			executable = 1;
+			direction = 0;
+			readWrite = 1;
+			accessed = 0;
+		};
+		
+		bitfield[4] flags {
+			granularity = 1;
+			size = 1;
+			0;
+			0;
+		};
+	},
+	{ // kernel data segment
+		Bit[20] limit = 0xFFFFF;
+		Byte4 base = 0;
+		
+		Bit present = 1;
+		Bit2 ringLevel = 0;
+		bitfield[5] access {
+			1;
+			executable = 0;
+			direction = 0;
+			readWrite = 1;
+			accessed = 0;
+		};
+		
+		bitfield[4] flags {
+			granularity = 1;
+			size = 1;
+			0;
+			0;
+		};
+	},
+];
 
 
 function EntryPoint() #noRet #noStack {
@@ -41,11 +104,19 @@ function EntryPoint() #noRet #noStack {
 	%eax = %cr0;
 	%al |= 1; // set PE (Protection Enable) bit in CR0 (Control Register 0)
 	%cr0 = %eax;
-	
-	Jmp(08h:.PModeMain); // @TODO check Alopos.C
+
+	%ax = sizeof(GDTSegmentDescriptor) * 2;
+    %ds = %ax;
+    %es = %ax;
+    %fs = %ax;
+    %ss = %ax;
+
+    Ljmp(sizeof(GDTSegmentDescriptor) * 1, $.PModeMain);
 .PModeMain:
 	
 }
+
+#WriteData();
 
 #Align(512 - 2; padWith = 0x00);
 #Put2(0xaa55); // boot sector magic number
