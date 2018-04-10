@@ -100,6 +100,9 @@ GDTSegmentDescriptor[] gdtSegments = [
 
 function EntryPoint() #noRet #noStack {
 	Cli();
+	// @TODO disable NMI
+	// @TODO enable A20
+	
 	Lgdt(gdtDescriptor);
 	%eax = %cr0;
 	%al |= 1; // set PE (Protection Enable) bit in CR0 (Control Register 0)
@@ -111,7 +114,7 @@ function EntryPoint() #noRet #noStack {
     %fs = %ax;
     %ss = %ax;
 
-    Ljmp(sizeof(GDTSegmentDescriptor) * 1, $.PModeMain);
+    Ljmp(sizeof(GDTSegmentDescriptor) * 1, .PModeMain);
 .PModeMain:
 	
 }
