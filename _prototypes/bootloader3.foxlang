@@ -2,40 +2,14 @@
 //#bits = 16;
 #address = 0x7c00;
 
-struct { // 6 bytes, goes in GDTR (GDT register)
-	Byte2 size = sizeof(gdtSegments) - 1; // size is actual size - 1
-	GDTSegmentDescriptor[] Pointer address = &gdtSegments;
-} gdtDescriptor;
-
-struct GDTSegmentDescriptor #packed { // 8 bytes, GDT entry
-	Bit[20] limit[0 .. 15];
-	Byte4 base[0 .. 2];
-	
-	Bit present;
-	Bit2 ringLevel;
-	bitfield[5] access {
-		1;
-		executable;
-		direction;
-		readWrite;
-		accessed;
-	};
-	
-	bitfield[4] flags {
-		granularity;
-		size;
-		0;
-		0;
-	};
-	Bit[20] limit[16 .. 19];
-	Byte4 base[3];
-}
+type GDTSegmentDescriptor : Byte[8];
 
 GDTSegmentDescriptor[] gdtSegments = [
-	{ // NULL segment
-		Bit[20] limit = 0;
-		Byte4 base = 0;
+	[ // NULL segment
+		0, 0, // Bit[20] limit = 0; // Bit[20] limit[0 .. 15];
+		0, 0, 0, //Byte4 base = 0; // Byte4 base[0 .. 2];
 		
+		0b00010000, /*
 		Bit present = 0;
 		Bit2 ringLevel = 0;
 		bitfield[5] access {
@@ -44,19 +18,22 @@ GDTSegmentDescriptor[] gdtSegments = [
 			direction = 0;
 			readWrite = 0;
 			accessed = 0;
-		};
+		};*/
 		
-		bitfield[4] flags {
+		0, /* bitfield[4] flags {
 			granularity = 0;
 			size = 0;
 			0;
 			0;
-		};
-	},
-	{ // kernel code segment
-		Bit[20] limit = 0xFFFFF;
-		Byte4 base = 0;
+		};*/
+		// Bit[20] limit[16 .. 19];
+		0, // Byte4 base[3];
+	],
+	[ // kernel code segment
+		0xFF, 0xFF, // Bit[20] limit = 0xFFFFF; // Bit[20] limit[0 .. 15];
+		0, 0, 0, // Byte4 base = 0; // Byte4 base[0 .. 2];
 		
+		0b10011010, /*
 		Bit present = 1;
 		Bit2 ringLevel = 0;
 		bitfield[5] access {
@@ -65,20 +42,23 @@ GDTSegmentDescriptor[] gdtSegments = [
 			direction = 0;
 			readWrite = 1;
 			accessed = 0;
-		};
+		};*/
 		
-		bitfield[4] flags {
+		0b11001111,
+		/*bitfield[4] flags {
 			granularity = 1;
 			size = 1;
 			0;
 			0;
-		};
-	},
-	{ // kernel data segment
-		Bit[20] limit = 0xFFFFF;
-		Byte4 base = 0;
+		};*/
+		// Bit[20] limit[16 .. 19];
+		0, // Byte4 base[3];
+	],
+	[ // kernel data segment
+		0xFF, 0xFF, //Bit[20] limit = 0xFFFFF; // Bit[20] limit[0 .. 15];
+		0, 0, 0, //Byte4 base = 0; // Byte4 base[0 .. 2];
 		
-		Bit present = 1;
+		0b10010010, /*Bit present = 1;
 		Bit2 ringLevel = 0;
 		bitfield[5] access {
 			1;
@@ -86,16 +66,23 @@ GDTSegmentDescriptor[] gdtSegments = [
 			direction = 0;
 			readWrite = 1;
 			accessed = 0;
-		};
+		};*/
 		
-		bitfield[4] flags {
+		0b11001111, /*bitfield[4] flags {
 			granularity = 1;
 			size = 1;
 			0;
 			0;
-		};
-	},
+		};*/
+		// Bit[20] limit[16 .. 19];
+		0, // Byte4 base[3];
+	],
 ];
+
+struct { // 6 bytes, goes in GDTR (GDT register)
+	Byte2 size = sizeof(gdtSegments) - 1; // size is actual size - 1
+	GDTSegmentDescriptor[] Pointer address = &gdtSegments;
+} gdtDescriptor;
 
 
 function EntryPoint() #noRet #noStack {
